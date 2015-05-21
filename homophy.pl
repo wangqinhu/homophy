@@ -37,7 +37,7 @@ define_homology();
 
 multiple_sequence_alignment();
 
-phyml_tree();
+#phyml_tree();
 
 clean_files();
 
@@ -160,18 +160,30 @@ sub use_alias {
 
 	my ($file, $alias) = @_;
 
+	my %id_repo = ();
 	my $i = 1;
+	my $control = undef;
 	open (IN, $file) or die "Cannot open file $file: $!\n";
 	open (OUT, ">$alias.fas") or die "Cannot open file $alias.fas: $!\n";
 	open (ALS, ">>alias.tsv") or die "Cannot open file alias: $!\n";
-	while (<IN>) {
-		if (/^>(\S+)/) {
-			my $alias_id = $alias . $i;
-			print ALS $alias_id, "\t", "$1", "\n";
-			print OUT ">", $alias_id, "\n";
-			$i++;
+	while (my $line = <IN>) {
+		if ($line =~ /^>(\S+)/) {
+			my $full_id = $1;
+			my ($id, $var) = split /\./, $full_id, 2;
+			# use only one version of a protein in one locus
+			unless (exists $id_repo{$id}) {
+				my $alias_id = $alias . $i;
+				$id_repo{$id} = $alias_id;
+				print OUT ">", $alias_id, "\n";
+				print ALS $alias_id, "\t", $full_id, "\n";
+				$i++;
+				$control = 1;
+			} else {
+				print ALS $id_repo{$id}, "\t", $full_id, "\n";
+				$control = 0;
+			}
 		} else {
-			print OUT $_;
+			print OUT $line if $control == 1;
 		}
 	}
 	close ALS;
