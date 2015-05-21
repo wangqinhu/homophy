@@ -37,7 +37,7 @@ define_homology();
 
 multiple_sequence_alignment();
 
-#phyml_tree();
+phyml_tree();
 
 clean_files();
 
