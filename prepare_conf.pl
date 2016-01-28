@@ -11,7 +11,7 @@ my $org = $ARGV[0] || "demo.organism.txt";
 #               N --> first N word(s)
 my $mme = $ARGV[1] || 2;
 # database directory
-my $dir = $ARGV[2] || "database";
+my $dir = $ARGV[2] || "data/seq";
 # output configuration file
 my $cfg = $ARGV[3] || "homophy.conf";
 my $query = $ARGV[4] || "query.fa";
@@ -96,7 +96,13 @@ sub read_files {
 		if (-d $_) {
 			read_files ($_);
 		} else {
-			push @filenames, $_;
+			if (/\.gz$/) {
+				system("gunzip -d $_");
+			}
+			s/\.gz$//;
+			if (/\.fa$/ or /\.fas$/ or /\.fasta/ or /\.fsa/) {
+				push @filenames, $_;
+			}
 		}
-	}	
+	}
 }
