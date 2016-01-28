@@ -1,0 +1,10 @@
+Aspergillus nidulans
+Fusarium graminearum
+Laccaria bicolor S238N-H82
+Magnaporthe oryzae
+Puccinia triticina
+Saccharomyces cerevisiae
+Saitoella complicata NRRL Y-17804
+Schizosaccharomyces pombe
+Ustilago maydis
+Verticillium dahliae
