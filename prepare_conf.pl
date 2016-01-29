@@ -43,8 +43,8 @@ my $size = keys %pair;
 my $i  = 1;
 open (CFG, ">$cfg") or die "Cannot open file $cfg: $!";
 print CFG "# Configuration for homophy\n\n# Sequence\n";
-print CFG "query : query.fa\n";
-print CFG "query_num : $size\n";
+print CFG "query  : $query\n";
+print CFG "db_num : $size\n";
 foreach (sort keys %pair) {
 	print CFG "db" . $i . "       : " . $pair{$_} . "\n";
 	s/ /\_/g;
@@ -54,9 +54,9 @@ foreach (sort keys %pair) {
 print CFG <<BLAST;
 
 # BLAST
-# e-value   : 1e-50
-# filter    : F
-# min_hit   : 0.5
+e-value   : 1e-25
+filter    : F
+min_hit   : 0.5
 
 BLAST
 close CFG;

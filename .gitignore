@@ -1,3 +1,8 @@
 data/
 homophy.conf
 organism.txt
+query-db*
+db*
+*.fas
+formatdb.log
+alias.tsv
