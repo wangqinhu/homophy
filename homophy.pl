@@ -10,6 +10,9 @@ use Config::Simple;
 my $conf = $ARGV[0];
 my %conf = ();
 my $dir  = $ARGV[1] || "output";
+# 1 --> format blast database
+# 0 --> database exist
+my $formatdb = $ARGV[2] || 1;
 system("mkdir -p $dir");
 
 if ( $conf ) {
@@ -76,7 +79,9 @@ sub homology_search {
 		die "Database file $db does not exist, aborted!\n";
 	}
 
-	system("formatdb -i $db -p T");
+	if ($formatdb == 1)
+		system("formatdb -i $db -p T -l $dir/formatdb.log");
+	}
 
 	print "Query: $query\n";
 	print "Database: $db\n";
@@ -203,7 +208,7 @@ sub phyml_tree {
 
 sub clean_files {
 
-	system("rm formatdb.log");
+	system("rm $dir/formatdb.log");
 	system("rm $dir/query-db*.tsv");
 	system("rm $dir/combined*");
 	system("rm $dir/db*_hit.fasta ");
