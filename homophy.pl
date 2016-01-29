@@ -9,6 +9,8 @@ use Config::Simple;
 #-------------------------------------------------------------------------------
 my $conf = $ARGV[0];
 my %conf = ();
+my $dir  = $ARGV[1] || "output";
+system("mkdir -p $dir");
 
 if ( $conf ) {
 
@@ -52,8 +54,8 @@ sub define_homology {
 
 	foreach my $i (1..$db_num) {
 		my $db  = $conf{"db" . $i};
-		my $out = "query-db" . $i . ".tsv";
-		my $hit = "db" . $i . "_hit.fasta";
+		my $out = $dir . "/" . "query-db" . $i . ".tsv";
+		my $hit = $dir . "/" . "db" . $i . "_hit.fasta";
 		homology_search($query, $db, $out);
 		extract_seq($query, $db, $out, $hit);
 		use_alias($hit, $conf{"db" . $i . "_alias"})
@@ -151,8 +153,8 @@ sub multiple_sequence_alignment {
 	my $query  = $conf{"query"};
 
 	print "Aligning sequences ...\n";
-	system("cat $query *.fas > combined.fas");
-	system("clustalw2 -INFILE=combined.fas -TYPE=PROTEIN -OUTPUT=PHYLIP -OUTFILE=alignment.phy -QUIET 1>/dev/null 2>&1");
+	system("cat $query $dir/*.fas > $dir/combined.fas");
+	system("clustalw2 -INFILE=$dir/combined.fas -TYPE=PROTEIN -OUTPUT=PHYLIP -OUTFILE=$dir/alignment.phy -QUIET 1>/dev/null 2>&1");
 
 }
 
@@ -164,8 +166,8 @@ sub use_alias {
 	my $i = 1;
 	my $control = undef;
 	open (IN, $file) or die "Cannot open file $file: $!\n";
-	open (OUT, ">$alias.fas") or die "Cannot open file $alias.fas: $!\n";
-	open (ALS, ">>alias.tsv") or die "Cannot open file alias: $!\n";
+	open (OUT, ">$dir/$alias.fas") or die "Cannot open file $dir/$alias.fas: $!\n";
+	open (ALS, ">>$dir/alias.tsv") or die "Cannot open file $dir/alias.tsv: $!\n";
 	while (my $line = <IN>) {
 		if ($line =~ /^>(\S+)/) {
 			my $full_id = $1;
@@ -195,15 +197,15 @@ sub use_alias {
 sub phyml_tree {
 
 	print "Running phyml ...\n";
-	system("phyml -i alignment.phy -d aa -p -m WAG -v e -s NNI --no_memory_check --quiet");
+	system("phyml -i $dir/alignment.phy -d aa -p -m WAG -v e -s NNI --no_memory_check --quiet");
 
 }
 
 sub clean_files {
 
 	system("rm formatdb.log");
-	system("rm query-db*.tsv");
-	system("rm combined*");
-	system("rm db*_hit.fasta ");
+	system("rm $dir/query-db*.tsv");
+	system("rm $dir/combined*");
+	system("rm $dir/db*_hit.fasta ");
 
 }

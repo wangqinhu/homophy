@@ -5,4 +5,4 @@ query-db*
 db*
 *.fas
 formatdb.log
-alias.tsv
+ali*
