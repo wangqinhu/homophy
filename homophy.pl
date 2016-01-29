@@ -79,7 +79,7 @@ sub homology_search {
 		die "Database file $db does not exist, aborted!\n";
 	}
 
-	if ($formatdb == 1)
+	if ($formatdb == 1) {
 		system("formatdb -i $db -p T -l $dir/formatdb.log");
 	}
 
