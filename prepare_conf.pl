@@ -15,6 +15,7 @@ my $dir = $ARGV[2] || "data/seq";
 # output configuration file
 my $cfg = $ARGV[3] || "homophy.conf";
 my $query = $ARGV[4] || "query.fa";
+my $evalue = $ARGV[5] || "1e-20";
 
 # hold organisms
 my %organisms = ();
@@ -54,7 +55,7 @@ foreach (sort keys %pair) {
 print CFG <<BLAST;
 
 # BLAST
-e-value   : 1e-25
+e-value   : $evalue
 filter    : F
 min_hit   : 0.5
 
