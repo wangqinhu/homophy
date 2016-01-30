@@ -1,7 +1,9 @@
 all:
-	./prepare_conf.pl organism.txt 2 data/seq data/conf/$(GENE).conf data/seed/$(GENE).fa 1e-20
-	./homophy.pl data/conf/$(GENE).conf data/family/$(GENE) $(DB)
+	mkdir -p data/$(LAB)_conf
+	mkdir -p data/$(LAB)_family
+	./prepare_conf.pl organism.txt 2 data/seq data/$(LAB)_conf/$(GENE).conf data/$(LAB)/$(GENE).fa 1e-20
+	./homophy.pl data/$(LAB)_conf/$(GENE).conf data/$(LAB)_family/$(GENE) $(DB)
 clean:
-	rm -rf data/conf/*
-	rm -rf data/family/*
+	rm -rf data/*conf/*
+	rm -rf data/*family/*
 	rm -rf homophy.o*

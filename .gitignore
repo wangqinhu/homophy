@@ -1,8 +1,10 @@
 data/
-*.conf
+homophy.conf
 organism.txt
 query-db*
 db*
 *.fas
 formatdb.log
 ali*
+homophy.o*
+core.*

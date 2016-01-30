@@ -91,7 +91,7 @@ sub read_files {
 	my @files = grep { !/^\.{1,2}$/ } readdir (DIR);
 	closedir (DIR);
 
-    @files = map { $path . '/' . $_ } @files;
+	@files = map { $path . '/' . $_ } @files;
 
 	for (@files) {
 		if (-d $_) {
