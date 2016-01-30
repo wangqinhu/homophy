@@ -1,5 +1,5 @@
 data/
-homophy.conf
+*.conf
 organism.txt
 query-db*
 db*
