@@ -9,3 +9,4 @@ for gene in  ${genes[@]}; do
 	fi
 done
 
+./homostat.pl data/$label\_conf/$label\1.conf data/$label\_family > $label.tsv
