@@ -13,6 +13,7 @@ my @org = split /\n/, $org;
 # read alias
 my @alias = ();
 read_alias($alias_dir);
+@alias = sort by_strnum @alias;
 
 # header
 my $header = "";
@@ -44,6 +45,13 @@ sub by_num {
 	$a <=> $b;
 }
 
+sub by_strnum {
+	$a =~ /(\d+)/;
+	my $numa = $1;
+	$b =~ /(\d+)/;
+	my $numb = $1;
+	return $numa <=> $numb;
+}
 # read alias in the subdirectories
 sub read_alias {
 	my $path = shift;
