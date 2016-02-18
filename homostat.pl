@@ -2,6 +2,8 @@
 
 use strict;
 use warnings;
+use Bio::DB::Taxonomy;
+use Bio::Tree::Tree;
 
 my $conf  = $ARGV[0];
 my $alias_dir = $ARGV[1];
@@ -21,7 +23,10 @@ foreach my $alias (@alias) {
 	my @a = split /\//, $alias;
 	$header .= "\t$a[-2]";
 }
-print $header, "\n";
+print $header, "\tTax\n";
+
+# tax info
+my %tax = taxonomy(@org);
 
 # stat
 my %num = ();
@@ -37,7 +42,7 @@ foreach my $org (@org) {
 			$num{$org} .= "\t" . 0;
 		}
 	}
-	print $org, $num{$org}, "\n";
+	print $org, $num{$org}, "\t", $tax{$org}, "\n";
 }
 
 # sort by number
@@ -71,4 +76,32 @@ sub read_alias {
 			}
 		}
 	}
+}
+
+# extract taxonomy information
+sub taxonomy {
+	my @taxnames = @_;
+	my %lineages = ();
+
+	my $nodesfile = "data/taxonomy/nodes.dmp";
+	my $namesfile = "data/taxonomy/names.dmp";
+
+	my $db = Bio::DB::Taxonomy->new(-source => 'flatfile',
+		-nodesfile => $nodesfile,
+		-namesfile => $namesfile);
+
+	foreach my $taxname (@taxnames) {
+		my $taxon = $db->get_taxon(-name => $taxname);
+		my $tree = Bio::Tree::Tree->new(-node => $taxon);
+		my @taxa = $tree->get_nodes;
+		my $nodes = "";
+		for (my $i = 1; $i < @taxa - 1; $i++) {
+			my $t = $taxa[$i];
+			my $nname = $db->get_taxon(-taxonid => $t->id());
+			$nodes .= $nname->scientific_name() . "|";
+		}
+		$lineages{$taxname} = $nodes . $taxon->scientific_name();
+	}
+
+	return %lineages;
 }
