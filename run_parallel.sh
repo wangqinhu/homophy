@@ -10,6 +10,6 @@ genes=("SEQ1" "SEQ2")
 gene=${genes[$(expr $SGE_TASK_ID - 1)]}
 
 if [ -e data/$label/$gene.fa ]; then
-	make GENE=$gene DB=0 LAB=$label
+	make GENE=$gene DB=0 LAB=$label HO=1
 fi
 

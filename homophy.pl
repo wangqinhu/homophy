@@ -13,6 +13,7 @@ my $dir  = $ARGV[1] || "output";
 # 1 --> format blast database
 # 0 --> database exist
 my $formatdb = $ARGV[2] || 1;
+my $define_homology_only = $ARGV[3] || "1";
 system("mkdir -p $dir");
 
 if ( $conf ) {
@@ -64,6 +65,7 @@ sub define_homology {
 		use_alias($hit, $conf{"db" . $i . "_alias"})
 	}
 
+	exit if $define_homology_only == 1;
 }
 
 sub homology_search {
@@ -177,6 +179,8 @@ sub use_alias {
 		if ($line =~ /^>(\S+)/) {
 			my $full_id = $1;
 			my $id = $full_id;
+			# remove "-P$"
+			$id =~ s/\-P$//;
 			# remove ".(t)x{1,2}"
 			$id =~ s/\.t{0,1}\d{1,2}$//;
 			# remove "_P*"
