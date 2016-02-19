@@ -69,7 +69,7 @@ sub define_homology {
 sub homology_search {
 
 	my ($query, $db, $out) = @_;
-	my $add = " -e " . $conf{"e-value"} . " -F " . $conf{"filter"};
+	my $add = " -e " . $conf{"e-value"} . " -F " . $conf{"filter"} . " -a " . $conf{"ncpu"};
 
 	unless ( -e $query) {
 		die "Query file $query does not exist, aborted!\n";
@@ -176,7 +176,15 @@ sub use_alias {
 	while (my $line = <IN>) {
 		if ($line =~ /^>(\S+)/) {
 			my $full_id = $1;
-			my ($id, $var) = split /\./, $full_id, 2;
+			my $id = $full_id;
+			# remove ".(t)x{1,2}"
+			$id =~ s/\.t{0,1}\d{1,2}$//;
+			# remove "_P*"
+			$id =~ s/\_P.*$//;
+			# remove "-P."
+			$id =~ s/\-P.{1,2}$//;
+			# remove "Tx"
+			$id =~ s/T\d$//;
 			# use only one version of a protein in one locus
 			unless (exists $id_repo{$id}) {
 				my $alias_id = $alias . $i;

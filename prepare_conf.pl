@@ -16,6 +16,7 @@ my $dir = $ARGV[2] || "data/seq";
 my $cfg = $ARGV[3] || "homophy.conf";
 my $query = $ARGV[4] || "query.fa";
 my $evalue = $ARGV[5] || "1e-20";
+my $ncpu = $ARGV[6] || "12";
 
 # hold organisms
 my %organisms = read_organisms($org);
@@ -61,6 +62,7 @@ print CFG <<BLAST;
 e-value   : $evalue
 filter    : F
 min_hit   : 0.5
+ncpu      : $ncpu
 
 BLAST
 close CFG;
