@@ -18,8 +18,7 @@ my $query = $ARGV[4] || "query.fa";
 my $evalue = $ARGV[5] || "1e-20";
 
 # hold organisms
-my %organisms = ();
-read_organisms($org);
+my %organisms = read_organisms($org);
 
 # hold filenames
 my @filenames = ();
@@ -27,7 +26,8 @@ read_files($dir);
 
 # make pair
 my %pair = ();
-foreach my $org (sort %organisms) {
+foreach my $org (sort values %organisms) {
+	next if (defined $pair{$org});
 	foreach my $file (@filenames) {
 		my @filename = split /\//, $file;
 		my @orgname = split /\./, $filename[-1];
@@ -36,6 +36,9 @@ foreach my $org (sort %organisms) {
 		if ($name =~ /$org/) {
 			$pair{$org} = $file;
 		}
+	}
+	if (!defined $pair{$org}) {
+		warn "$org: No matched fasta file found!\n";
 	}
 }
 
@@ -65,6 +68,7 @@ close CFG;
 # Get the organism name in organism file
 sub read_organisms {
 	my $org = shift;
+	my %organisms = ();
 
 	open (ORG, $org) or die "Cannot open file $org: $!";
 	while (<ORG>) {
@@ -74,13 +78,16 @@ sub read_organisms {
 		$organisms{$_} = $_;
 		if ($mme != 0) {
 			my @w = split /\s/;
-				$organisms{$_} = "";
-			for my $id (0..($mme-1)) {
+			$organisms{$_} = $w[0];
+			for my $id (1..($mme-1)) {
 				$organisms{$_} .= " " . $w[$id];
 			}
 		}
+		$organisms{$_} =~ s/\.//g;
 	}
 	close ORG;
+
+	return %organisms;
 }
 
 # Get the full path of each file in the database directory
