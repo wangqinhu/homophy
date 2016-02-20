@@ -9,7 +9,7 @@ my $conf  = $ARGV[0];
 my $alias_dir = $ARGV[1];
 
 # read organisms
-my $org = `grep "alias" $conf | cut -f3 -d ' ' | cut -f1,2 -d "_"`;
+my $org = `grep "alias" $conf | cut -f3 -d ' ' | sed 's/\_/ /g'`;
 my @org = split /\n/, $org;
 
 # read alias
@@ -32,8 +32,10 @@ my %tax = taxonomy(@org);
 my %num = ();
 foreach my $org (@org) {
 	foreach my $alias (@alias) {
+		$org =~ s/ /\_/g;
 		my $hit = `grep $org $alias | cut -f1`;
 		$hit =~ s/$org//g;
+		$org =~ s/\_/ /g;
 		if ($hit ne "") {
 			my @v = split /\n/, $hit;
 			@v = sort by_num @v;
@@ -92,15 +94,17 @@ sub taxonomy {
 
 	foreach my $taxname (@taxnames) {
 		my $taxon = $db->get_taxon(-name => $taxname);
-		my $tree = Bio::Tree::Tree->new(-node => $taxon);
-		my @taxa = $tree->get_nodes;
-		my $nodes = "";
-		for (my $i = 1; $i < @taxa - 1; $i++) {
-			my $t = $taxa[$i];
-			my $nname = $db->get_taxon(-taxonid => $t->id());
-			$nodes .= $nname->scientific_name() . "|";
+		if (defined($taxon)) {
+			my $tree = Bio::Tree::Tree->new(-node => $taxon);
+			my @taxa = $tree->get_nodes;
+			my $nodes = "";
+			for (my $i = 1; $i < @taxa - 1; $i++) {
+				my $t = $taxa[$i];
+				my $nname = $db->get_taxon(-taxonid => $t->id());
+				$nodes .= $nname->scientific_name() . "|";
+			}
+			$lineages{$taxname} = $nodes . $taxon->scientific_name();
 		}
-		$lineages{$taxname} = $nodes . $taxon->scientific_name();
 	}
 
 	return %lineages;
