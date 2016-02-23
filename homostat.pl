@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Bio::DB::Taxonomy;
 use Bio::Tree::Tree;
+use Bio::TreeIO;
 
 my $conf  = $ARGV[0];
 my $alias_dir = $ARGV[1];
@@ -46,6 +47,9 @@ foreach my $org (@org) {
 	}
 	print $org, $num{$org}, "\t", $tax{$org}, "\n";
 }
+
+# output species tree
+tax2tree(@org);
 
 # sort by number
 sub by_num {
@@ -92,6 +96,8 @@ sub taxonomy {
 		-nodesfile => $nodesfile,
 		-namesfile => $namesfile);
 
+	# based on:
+	# https://github.com/gawbul/bioinformatics-scripts/blob/master/tax_identifier.pl
 	foreach my $taxname (@taxnames) {
 		my $taxon = $db->get_taxon(-name => $taxname);
 		if (defined($taxon)) {
@@ -108,4 +114,44 @@ sub taxonomy {
 	}
 
 	return %lineages;
+}
+
+# based on bioperl script bp_taxonomy2tree.pl
+sub tax2tree {
+	my @species = @_;
+
+	my $nodesfile = "data/taxonomy/nodes.dmp";
+	my $namesfile = "data/taxonomy/names.dmp";
+
+	my $db = Bio::DB::Taxonomy->new(-source => 'flatfile',
+		-nodesfile => $nodesfile,
+		-namesfile => $namesfile);
+
+	# the full lineages of the species are merged into a single tree
+	my $tree = undef;
+	for my $name (@species) {
+		my $ncbi_id = $db->get_taxonid($name);
+		if ($ncbi_id) {
+			my $node = $db->get_taxon(-taxonid => $ncbi_id);
+			if ($tree) {
+				$tree->merge_lineage($node);
+			} else {
+				$tree = new Bio::Tree::Tree(-node => $node);
+			}
+		} else {
+			warn "no NCBI Taxonomy node for species ",$name,"\n";
+		}
+	}
+
+	# simple paths are contracted by removing degree one nodes
+	$tree->contract_linear_paths;
+
+	# convert tree ids to their names for nice output with TreeIO
+	foreach my $node ($tree->get_nodes) {
+		$node->id($node->node_name);
+	}
+
+	# the tree is output in Newick format
+	my $output = new Bio::TreeIO(-format => 'newick', -file => ">species.tree");
+	$output->write_tree($tree);
 }
