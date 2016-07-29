@@ -30,6 +30,7 @@ my %pair = ();
 foreach my $org (sort values %organisms) {
 	next if (defined $pair{$org});
 	foreach my $file (@filenames) {
+		next unless ($file =~ /\.fasta$/ or $file =~ /\.fa$/);
 		my @filename = split /\//, $file;
 		my @orgname = split /\./, $filename[-1];
 		my $name = $orgname[0];
