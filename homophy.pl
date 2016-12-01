@@ -13,7 +13,7 @@ my $dir  = $ARGV[1] || "output";
 # 1 --> format blast database
 # 0 --> database exist
 my $formatdb = $ARGV[2] || 1;
-my $define_homology_only = $ARGV[3] || "1";
+my $define_homology_only = $ARGV[3] || "yes";
 system("mkdir -p $dir");
 
 if ( $conf ) {
@@ -65,7 +65,7 @@ sub define_homology {
 		use_alias($hit, $conf{"db" . $i . "_alias"})
 	}
 
-	exit if $define_homology_only == 1;
+	exit if (lc($define_homology_only) eq "yes");
 }
 
 sub homology_search {
