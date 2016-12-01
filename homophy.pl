@@ -189,6 +189,8 @@ sub use_alias {
 			$id =~ s/\-P.{1,2}$//;
 			# remove "Tx"
 			$id =~ s/T\d$//;
+			# remove "-x{2}$"
+			$id =~ s/\-\d{2}$//;
 			# use only one version of a protein in one locus
 			unless (exists $id_repo{$id}) {
 				my $alias_id = $alias . $i;
